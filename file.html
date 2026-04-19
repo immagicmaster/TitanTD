@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Master | Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0a0a0a; /* Nền tối */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Video hoặc Ảnh nền */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        /* Hiệu ứng mờ cho khung Profile */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 350px;
+            animation: fadeIn 1.5s ease-in-out;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .bio {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        /* Các nút liên kết */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .link-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        .link-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Icon mạng xã hội ở dưới */
+        .socials {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        .socials a {
+            color: white;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .socials a:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
+        /* Màn hình chờ "Click to enter" (tùy chọn) */
+        #enter-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="enter-screen" onclick="enterSite()">
+        <p style="letter-spacing: 3px; font-weight: 300;">[ CLICK TO ENTER ]</p>
+    </div>
+
+    <div class="background-overlay"></div>
+
+    <div class="profile-card">
+        <img src="https://i.pravatar.cc/150?img=68" alt="Avatar" class="avatar">
+        
+        <h1>Magic Master</h1>
+        <p class="bio">Professional Developer | Gamer | Designer</p>
+
+        <div class="links">
+            <a href="#" class="link-item">
+                <i class="fa-brands fa-discord"></i> Discord Server
+            </a>
+            <a href="#" class="link-item">
+                <i class="fa-solid fa-code"></i> My Portfolio
+            </a>
+            <a href="#" class="link-item">
+                <i class="fa-solid fa-envelope"></i> Contact Me
+            </a>
+        </div>
+
+        <div class="socials">
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-github"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function enterSite() {
+            const screen = document.getElementById('enter-screen');
+            screen.style.opacity = '0';
+            setTimeout(() => {
+                screen.style.display = 'none';
+            }, 800);
+            
+            // Bạn có thể thêm nhạc nền vào đây nếu muốn tự động phát khi nhấn enter
+        }
+    </script>
+</body>
+</html>
