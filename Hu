@@ -1,0 +1,251 @@
+--// MAGIC AUTO INTERACT GUI + Speed + NameTag
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local MAX_DISTANCE = 800
+local CurrentDelay = 0.01
+local AutoInteractEnabled = false
+local TARGET_SPEED = 35
+local NAMETAG_UPDATE_INTERVAL = 0.5
+
+----------------------------------------------------
+-- GUI
+----------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MagicAutoInteract"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 230, 0, 190)
+MainFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 28)
+Title.BackgroundTransparency = 1
+Title.Text = "⚙️ Magic Auto Interact"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = MainFrame
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Position = UDim2.new(1, -30, 0, 3)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 70, 70)
+CloseButton.BackgroundTransparency = 1
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 16
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = MainFrame
+ToggleButton.Size = UDim2.new(0, 190, 0, 35)
+ToggleButton.Position = UDim2.new(0, 20, 0, 40)
+ToggleButton.Text = "🔴 OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+Instance.new("UICorner", ToggleButton)
+
+local DelayLabel = Instance.new("TextLabel")
+DelayLabel.Parent = MainFrame
+DelayLabel.Size = UDim2.new(1, -40, 0, 20)
+DelayLabel.Position = UDim2.new(0, 20, 0, 85)
+DelayLabel.BackgroundTransparency = 1
+DelayLabel.Text = "Delay: " .. tostring(CurrentDelay) .. "s"
+DelayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+DelayLabel.Font = Enum.Font.Gotham
+DelayLabel.TextSize = 14
+DelayLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local DelayButton = Instance.new("TextButton")
+DelayButton.Parent = MainFrame
+DelayButton.Size = UDim2.new(0, 190, 0, 25)
+DelayButton.Position = UDim2.new(0, 20, 0, 110)
+DelayButton.Text = "⏱ Increase Delay"
+DelayButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DelayButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+DelayButton.Font = Enum.Font.Gotham
+DelayButton.TextSize = 14
+Instance.new("UICorner", DelayButton)
+
+local DistanceLabel = Instance.new("TextLabel")
+DistanceLabel.Parent = MainFrame
+DistanceLabel.Size = UDim2.new(1, -40, 0, 20)
+DistanceLabel.Position = UDim2.new(0, 20, 0, 140)
+DistanceLabel.BackgroundTransparency = 1
+DistanceLabel.Text = "Distance: " .. tostring(MAX_DISTANCE) .. " studs"
+DistanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+DistanceLabel.Font = Enum.Font.Gotham
+DistanceLabel.TextSize = 14
+DistanceLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local DistanceButton = Instance.new("TextButton")
+DistanceButton.Parent = MainFrame
+DistanceButton.Size = UDim2.new(0, 190, 0, 25)
+DistanceButton.Position = UDim2.new(0, 20, 0, 165)
+DistanceButton.Text = "📏 Increase Distance"
+DistanceButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DistanceButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+DistanceButton.Font = Enum.Font.Gotham
+DistanceButton.TextSize = 14
+Instance.new("UICorner", DistanceButton)
+
+local ToggleGUIButton = Instance.new("TextButton")
+ToggleGUIButton.Parent = ScreenGui
+ToggleGUIButton.Size = UDim2.new(0, 100, 0, 35)
+ToggleGUIButton.Position = UDim2.new(0.05, 0, 0.8, 0)
+ToggleGUIButton.Text = "Show GUI"
+ToggleGUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleGUIButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleGUIButton.Font = Enum.Font.GothamBold
+ToggleGUIButton.TextSize = 14
+Instance.new("UICorner", ToggleGUIButton)
+ToggleGUIButton.Visible = false
+ToggleGUIButton.Draggable = true
+----------------------------------------------------
+-- GUI Logic
+----------------------------------------------------
+CloseButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	ToggleGUIButton.Visible = true
+end)
+ToggleGUIButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = true
+	ToggleGUIButton.Visible = false
+end)
+ToggleButton.MouseButton1Click:Connect(function()
+	AutoInteractEnabled = not AutoInteractEnabled
+	if AutoInteractEnabled then
+		ToggleButton.Text = "🟢 ON"
+		ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+	else
+		ToggleButton.Text = "🔴 OFF"
+		ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	end
+end)
+DelayButton.MouseButton1Click:Connect(function()
+	CurrentDelay = CurrentDelay + 0.5
+	if CurrentDelay > 5 then CurrentDelay = 0.01 end
+	DelayLabel.Text = "Delay: " .. tostring(CurrentDelay) .. "s"
+end)
+DistanceButton.MouseButton1Click:Connect(function()
+	MAX_DISTANCE = MAX_DISTANCE + 10
+	if MAX_DISTANCE > 800 then MAX_DISTANCE = 10 end
+	DistanceLabel.Text = "Distance: " .. tostring(MAX_DISTANCE) .. " studs"
+end)
+
+----------------------------------------------------
+-- Auto Speed 60
+----------------------------------------------------
+RunService.Heartbeat:Connect(function()
+	local char = LocalPlayer.Character
+	if char then
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum and hum.WalkSpeed ~= TARGET_SPEED then
+			hum.WalkSpeed = TARGET_SPEED
+		end
+	end
+end)
+
+----------------------------------------------------
+-- Auto Interact Logic
+----------------------------------------------------
+local function getHRP()
+	local char = LocalPlayer.Character
+	if not char then return nil end
+	return char:FindFirstChild("HumanoidRootPart")
+end
+
+local function getNearest(hrp)
+	local nearest, shortest = nil, MAX_DISTANCE
+	for _, obj in pairs(Workspace:GetDescendants()) do
+		if obj:IsA("ProximityPrompt") or obj:IsA("ClickDetector") or obj:IsA("TouchTransmitter") then
+			local bp = obj:IsA("BasePart") and obj or obj:FindFirstAncestorWhichIsA("BasePart")
+			if bp then
+				local dist = (bp.Position - hrp.Position).Magnitude
+				if dist < shortest then
+					shortest = dist
+					nearest = obj
+				end
+			end
+		end
+	end
+	return nearest
+end
+
+task.spawn(function()
+	while true do
+		if AutoInteractEnabled then
+			local hrp = getHRP()
+			if hrp then
+				local obj = getNearest(hrp)
+				if obj then
+					pcall(function()
+						if obj:IsA("ProximityPrompt") then
+							fireproximityprompt(obj)
+						elseif obj:IsA("ClickDetector") then
+							fireclickdetector(obj)
+						elseif obj:IsA("TouchTransmitter") then
+							firetouchinterest(hrp, obj.Parent, 0)
+							firetouchinterest(hrp, obj.Parent, 1)
+						end
+					end)
+				end
+			end
+		end
+		task.wait(CurrentDelay)
+	end
+end)
+
+----------------------------------------------------
+-- NameTag System
+----------------------------------------------------
+local function createOrUpdateNameTag(plr)
+	if plr == LocalPlayer then return end
+	if not plr.Character then return end
+	local head = plr.Character:FindFirstChild("Head")
+	if not head then return end
+
+	local tag = head:FindFirstChild("NameTag")
+	if not tag then
+		tag = Instance.new("BillboardGui")
+		tag.Name = "NameTag"
+		tag.Adornee = head
+		tag.Size = UDim2.new(0, 150, 0, 40)
+		tag.AlwaysOnTop = true
+		tag.StudsOffset = Vector3.new(0, 1.6, 0)
+		tag.Parent = head
+
+		local label = Instance.new("TextLabel")
+		label.Parent = tag
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.TextColor3 = Color3.fromRGB(200, 20, 20)
+		label.Font = Enum.Font.GothamBold
+		label.TextStrokeTransparency = 0
+		label.TextScaled = true
+	end
+
+	tag.TextLabel.Text = plr.Name
+end
+
+task.spawn(function()
+	while true do
+		for _, p in ipairs(Players:GetPlayers()) do
+			pcall(function() createOrUpdateNameTag(p) end)
+		end
+		task.wait(NAMETAG_UPDATE_INTERVAL)
+	end
+end)
