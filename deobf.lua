@@ -70,7 +70,7 @@ local callback_fn_10_ref_3 = callback_fn_10;
 floor_fn = game:GetService("Players");
 random_fn = floor_fn.LocalPlayer;
 char_fn = nil;
-local message_3 = "https://pastebin.com/raw/TYqMyvcA";
+local message_3 = "https://raw.githubusercontent.com/immagicmaster/TitanTD/refs/heads/main/AllowedList.lua";
 items_12 = function()
 		local v0;
 		local items = { game:HttpGet(message_3) };
